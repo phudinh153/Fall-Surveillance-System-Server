@@ -194,6 +194,10 @@ class RemoveHouseMember(APIView):
         )
 
 
+class AddDeviceMember(generics.GenericAPIView):
+    pass
+
+
 class AddHouseMember(generics.CreateAPIView):
     lookup_field = "house_id"
     queryset = models.House.objects.all()
@@ -343,3 +347,17 @@ class UpdateRoomMemberPermissions(generics.UpdateAPIView):
         room = get_object_or_404(models.Room, id=self.kwargs["room_id"])
         context["room"] = room
         return context
+
+
+class AddRoomMember(generics.CreateAPIView):
+    lookup_field = "house_id"
+    queryset = models.House.objects.all()
+    serializer_class = serializers.AddHouseMember
+    permission_classes = [
+        permissions.IsAuthenticated,
+        house_permissions.IsAllowInviteHouseMember,
+    ]
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs["data"].setdefault("house_id", self.kwargs["house_id"])
+        return super().get_serializer(*args, **kwargs)

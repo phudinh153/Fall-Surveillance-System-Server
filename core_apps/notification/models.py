@@ -41,7 +41,7 @@ class Notification(TimeStampedModel):
 
     # --------- Factory Methods ---------
     @classmethod
-    def create_house_notification(
+    def _create_house_notification(
         cls, event_code, house, label, description, meta: dict = None
     ):
         return cls.objects.create(
@@ -53,16 +53,12 @@ class Notification(TimeStampedModel):
         )
 
     @classmethod
-    def soft_create_house_notification(
-        cls, house, event_code, user, label, description, meta: dict = None
+    def _create_room_notification(
+        cls, event_code, room, label, description, meta: dict = None
     ):
-        """
-        Use this function in bulk_create
-        """
-        return cls(
-            house=house,
+        return cls.objects.create(
+            room=room,
             event_code=event_code,
-            user=user,
             label=label,
             description=description,
             meta=meta,
@@ -72,7 +68,7 @@ class Notification(TimeStampedModel):
     def create_add_house_member_notification(cls, house, invitor, new_members):
         from core_apps.user.serializers import ReadBasicUserProfile
 
-        notification = cls.create_house_notification(
+        notification = cls._create_house_notification(
             house=house,
             event_code=notification_enums.EventCodeChoices.ADD_MEMBER_TO_HOUSE,
             label="New member joined",
@@ -97,7 +93,7 @@ class Notification(TimeStampedModel):
         from core_apps.user.serializers import ReadBasicUserProfile
         from core_apps.house.serializers import RHouseBasic
 
-        notification = cls.create_house_notification(
+        notification = cls._create_house_notification(
             house=house,
             event_code=notification_enums.EventCodeChoices.UPDATE_HOUSE_METADATA,
             label="House info updated",
@@ -110,6 +106,39 @@ class Notification(TimeStampedModel):
             },
         )
         return notification
+
+    @classmethod
+    def create_update_room_metadata_notification(
+        cls,
+        room,
+        updator,
+        update_field_names,
+        old_values,
+        action="invite",  # 'Removed' or 'invite'
+    ):
+        assert len(update_field_names) == len(old_values)
+        from core_apps.user.serializers import ReadBasicUserProfile
+        from core_apps.house.serializers import RRoomBasic
+
+        notification = cls._create_room_notification(
+            room=room,
+            event_code=notification_enums.EventCodeChoices.UPDATE_ROOM_METADATA,
+            label="Room info updated",
+            description="",
+            meta={
+                "updator": ReadBasicUserProfile(updator).data,
+                "room": RRoomBasic(room).data,
+                "update_fields": update_field_names,
+                "old_values": old_values,
+            },
+        )
+        return notification
+
+    @classmethod
+    def create_update_room_member_notification(
+        cls, room, updator, new_members
+    ):
+        pass
 
     # --------- Queries ---------
     @classmethod

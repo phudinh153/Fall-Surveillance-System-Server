@@ -13,4 +13,8 @@ urlpatterns = [
         "house/<uuid:house_id>/",
         notification_views.HouseNotification.as_view(),
     ),
+    path(
+        "eventcode/all/",
+        notification_views.AllNotificationEventCode.as_view(),
+    ),
 ]

@@ -30,6 +30,10 @@ urlpatterns = [
         "houses/rooms/<uuid:room_id>/members/<uuid:member_id>/permissions/",
         views.UpdateRoomMemberPermissions.as_view(),
     ),
+    path(
+        "houses/rooms/<uuid:room_id>/add-members/",
+        views.AddRoomMember.as_view(),
+    ),
     # House Detail API
     path("houses/<uuid:house_id>/members/", views.HouseMember.as_view()),
     path(

@@ -1,5 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from core_apps.house import models as house_models
 from schema.paginators import SmallSizePagination
 from . import models as notification_models
@@ -37,4 +40,18 @@ class UserNotification(generics.ListAPIView):
     def get_queryset(self):
         return notification_models.Notification.get_user_notifications(
             user=self.request.user
+        )
+
+
+class AllNotificationEventCode(APIView):
+    def get(self, request, *args, **kwargs):
+        from . import enums
+
+        return Response(
+            {
+                "device_event_codes": enums.DEVICE_NOTIFICATION_EVENT_CODES,
+                "room_event_codes": enums.ROOM_NOTIFICATION_EVENT_CODES,
+                "house_event_codes": enums.HOUSE_NOTIFICATION_EVENT_CODES,
+            },
+            status=status.HTTP_200_OK,
         )

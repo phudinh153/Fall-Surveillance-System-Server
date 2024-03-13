@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from mixin import serializers as mixin_serializers
 from utils import list as list_utils
+from utils import common as common_utils
 from . import models
 
 User = get_user_model()
@@ -77,7 +78,18 @@ class CRURoomDetail(
         return room_permissions
 
     def update(self, instance, validated_data):
+        from core_apps.notification.models import Notification
+
         room = instance
+        update_fields = [field for field in validated_data]
+        old_values = common_utils.get_attr_values(room, update_fields)
+
+        Notification.create_update_room_metadata_notification(
+            room=room,
+            updator=self.context.get("request").user,
+            update_field_names=update_fields,
+            old_values=old_values,
+        )
         return room.update(
             name=validated_data.get("name", None),
             description=validated_data.get("description", None),
@@ -108,6 +120,12 @@ class RHouseBasic(serializers.ModelSerializer):
             "address",
             "description",
         ]
+
+
+class RRoomBasic(serializers.ModelSerializer):
+    class Meta:
+        fields = ["id", "name", "description", "house"]
+        model = models.Room
 
 
 class CRUHouseDetail(
@@ -249,11 +267,9 @@ class CRUHouseDetail(
         from core_apps.notification.models import Notification
 
         house = instance
-        to_update_fields = [
-            field for field in validated_data if field in validated_data
-        ]
+        to_update_fields = [field for field in validated_data]
 
-        old_values = [getattr(house, f) for f in to_update_fields]
+        old_values = common_utils.get_attr_values(house, to_update_fields)
 
         Notification.create_update_house_metadata_notification(
             house=house,
@@ -570,3 +586,8 @@ class URoomMember(serializers.ModelSerializer):
             user, user_room_permission_names, room
         )
         return user
+
+
+# FIXME:
+# class AddRoomMember(serializers.ModelSerializer):
+#     pass
