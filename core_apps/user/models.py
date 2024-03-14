@@ -39,12 +39,16 @@ class MyUser(AbstractUser):
         is_test=False
     ):
         # NOTE: Use this method for create new user instead of objects.create()
+        from core_apps.permission.models import Permission
+
         if is_test:
             factory = cls.tests.create
         else:
             factory = cls.objects.create
         user = factory(username=username, password=password, **extra_fields)
         Profile.objects.create(user=user, **profile_fields)
+        Permission.initialize_user_permissions(user)
+
         return user
 
     # --------------- PROPERTIES --------------- #

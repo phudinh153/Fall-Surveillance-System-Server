@@ -502,18 +502,17 @@ class UHouseMember(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user = instance
         house_id = self.context.get("house_id")
+        house = get_object_or_404(models.House, id=house_id)
         user_house_permission_names = validated_data.get(
             "update_house_permissions", []
         )
         permission_models.Permission.remove_house_permissions(
             user_id=user.id,
-            house_id=house_id,
+            house_id=house.id,
             permission_names=permission_enums.HOUSE_PERMISSIONS,
         )
         permission_models.Permission.grant_houses_permissions(
-            user,
-            user_house_permission_names,
-            get_object_or_404(models.House, id=house_id),
+            user, user_house_permission_names, house
         )
         return user
 
