@@ -70,8 +70,10 @@ seed_users:
 initialize_users_permissions:
 	docker compose -f local.yaml exec api python manage.py initialize_permissions
 
-fix_user_room_permissions:
-	docker compose -f local.yaml exec api python manage.py fix_users_room_permissions
+initialize_users_permissions-production:
+	docker compose -f production.yaml exec api python manage.py initialize_permissions
+
+
 
 # make command="python manage.py createsuperuser"
 exec: 
