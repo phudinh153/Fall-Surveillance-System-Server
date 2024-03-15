@@ -47,7 +47,7 @@ class MyUser(AbstractUser):
             factory = cls.objects.create
         user = factory(username=username, password=password, **extra_fields)
         Profile.objects.create(user=user, **profile_fields)
-        Permission.initialize_user_permissions(user)
+        Permission.initialize_users_permissions(user)
 
         return user
 

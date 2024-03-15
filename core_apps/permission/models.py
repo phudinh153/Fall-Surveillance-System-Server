@@ -55,7 +55,7 @@ class Permission(models.Model):
         # Add indexing for permission, user
 
     @classmethod
-    def initialize_user_permissions(cls, user):
+    def initialize_users_permissions(cls, *users):
         """
         create all permission for correspond user
         """
@@ -64,6 +64,7 @@ class Permission(models.Model):
             [
                 cls(permission_type=permission_type, user=user)
                 for permission_type in permission_types
+                for user in users
             ],
             ignore_conflicts=True,
         )

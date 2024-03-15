@@ -81,7 +81,7 @@ class Notification(TimeStampedModel):
         from core_apps.user.serializers import ReadBasicUserProfile
         from core_apps.house.serializers import RHouseBasic
 
-        notification = cls.create_house_notification(
+        notification = cls._create_house_notification(
             house=house,
             event_code=notification_enums.EventCodeChoices.UPDATE_HOUSE_METADATA,
             label="House info updated",
@@ -125,6 +125,35 @@ class Notification(TimeStampedModel):
                 ).data,
             },
         )
+        return notification
+
+    @classmethod
+    def create_update_room_metadata_notification(
+        cls,
+        updator,
+        room,
+        update_field_names,
+        old_values,
+    ):
+        assert len(update_field_names) == len(
+            old_values
+        ), "Should be equal len"
+        from core_apps.user.serializers import ReadBasicUserProfile
+        from core_apps.house.serializers import RRoomBasic
+
+        notification = cls._create_room_notification(
+            room=room,
+            event_code=notification_enums.EventCodeChoices.UPDATE_ROOM_METADATA,
+            label="Room info updated",
+            description="",
+            meta={
+                "updator": ReadBasicUserProfile(updator).data,
+                "room": RRoomBasic(room).data,
+                "update_fields": update_field_names,
+                "old_values": old_values,
+            },
+        )
+
         return notification
 
     # --------- Queries ---------
