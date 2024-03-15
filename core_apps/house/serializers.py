@@ -24,6 +24,12 @@ class RHouseBasic(serializers.ModelSerializer):
         ]
 
 
+class RRoomBasic(serializers.ModelSerializer):
+    class Meta:
+        model = models.Room
+        fields = ["id", "name", "description", "house"]
+
+
 class CRURoomDetail(
     serializers.ModelSerializer, mixin_serializers.NoUpdateSerializer
 ):
@@ -83,11 +89,28 @@ class CRURoomDetail(
         return room_permissions
 
     def update(self, instance, validated_data):
+        from core_apps.notification.models import Notification
+
         room = instance
-        return room.update(
+
+        to_update_fields = list(validated_data.keys())
+
+        old_values = [getattr(room, f) for f in to_update_fields]
+
+        noti = Notification.create_update_room_metadata_notification(
+            room=room,
+            updator=self.context.get("request").user,
+            update_field_names=to_update_fields,
+            old_values=old_values,
+        )
+        print(noti, flush=True)
+
+        room.update(
             name=validated_data.get("name", None),
             description=validated_data.get("description", None),
         )
+
+        return room
 
     def create(self, validated_data):
         user = self.context.get("request").user
@@ -502,18 +525,17 @@ class UHouseMember(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user = instance
         house_id = self.context.get("house_id")
+        house = get_object_or_404(models.House, id=house_id)
         user_house_permission_names = validated_data.get(
             "update_house_permissions", []
         )
         permission_models.Permission.remove_house_permissions(
             user_id=user.id,
-            house_id=house_id,
+            house_id=house.id,
             permission_names=permission_enums.HOUSE_PERMISSIONS,
         )
         permission_models.Permission.grant_houses_permissions(
-            user,
-            user_house_permission_names,
-            get_object_or_404(models.House, id=house_id),
+            user, user_house_permission_names, house
         )
         return user
 

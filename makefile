@@ -67,10 +67,13 @@ list-backup:
 seed_users:
 	docker compose -f local.yaml exec api python manage.py seed_users ${count}
 
-# Use: make seed_relationship count=50
-seed_relationships:
-	docker compose -f local.yaml exec api python manage.py seed_user_relationship ${count}
+initialize_users_permissions:
+	docker compose -f local.yaml exec api python manage.py initialize_permissions
+
+fix_user_room_permissions:
+	docker compose -f local.yaml exec api python manage.py fix_users_room_permissions
 
 # make command="python manage.py createsuperuser"
 exec: 
 	docker compose -f local.yaml exec api ${command}
+
