@@ -140,9 +140,7 @@ class Permission(models.Model):
     # ----- Mutator -----
     @classmethod
     def grant_all_room_permissions(cls, user, *rooms):
-        cls.grant_rooms_permissions(
-            user=user, permission_type_names=enums.ROOM_PERMISSIONS, *rooms
-        )
+        cls.grant_rooms_permissions(user, enums.ROOM_PERMISSIONS, *rooms)
 
     @classmethod
     def remove_user_room_permissions(
