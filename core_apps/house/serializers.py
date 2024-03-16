@@ -97,13 +97,12 @@ class CRURoomDetail(
 
         old_values = [getattr(room, f) for f in to_update_fields]
 
-        noti = Notification.create_update_room_metadata_notification(
+        Notification.create_update_room_metadata_notification(
             room=room,
             updator=self.context.get("request").user,
             update_field_names=to_update_fields,
             old_values=old_values,
         )
-        print(noti, flush=True)
 
         room.update(
             name=validated_data.get("name", None),
@@ -614,7 +613,11 @@ class AddRoomMember(serializers.Serializer):
         to_add_members = validated_data["add_members"]
         room_id = validated_data["room_id"]
 
-        room = models.Room.objects.select_related("house").get(id=room_id)
+        try:
+            room = models.Room.objects.select_related("house").get(id=room_id)
+        except models.Room.DoesNotExist:
+            raise serializers.ValidationError("Room not found")
+
         new_members = User.objects.filter(
             id__in=set([member["id"] for member in to_add_members])
         )
@@ -703,7 +706,7 @@ class AddRoomMember(serializers.Serializer):
         query = Q()
         for member_data in add_members_data:
             query |= Q(
-                user_id=member_data["id"],
+                user__id=member_data["id"],
                 permission_type__name__in=member_data["room_permissions"],
             )
         correspond_permissions = Permission.objects.filter(query)
