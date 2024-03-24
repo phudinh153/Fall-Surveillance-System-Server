@@ -32,6 +32,7 @@ class Notification(TimeStampedModel):
         choices=notification_enums.EventCodeChoices.choices, max_length=255
     )
     meta = models.JSONField(null=True, blank=False, encoder=DjangoJSONEncoder)
+    is_seen = models.BooleanField(default=False)
 
     objects = notification_managers.NotificationManager()
 
@@ -162,15 +163,37 @@ class Notification(TimeStampedModel):
         return cls.objects.filter(
             house=house,
             event_code__in=notification_enums.HOUSE_NOTIFICATION_EVENT_CODES,
-        ).order_by("-created_at")
+        ).order_by("is_seen", "-created_at")
 
     @classmethod
     def get_room_notifications(cls, room):
         return cls.objects.filter(
             room=room,
             event_code__in=notification_enums.ROOM_NOTIFICATION_EVENT_CODES,
-        ).order_by("-created_at")
+        ).order_by(
+            "is_seen",
+            "-created_at",
+        )
 
     @classmethod
     def get_user_notifications(cls, user):
-        return cls.objects.filter(user=user).order_by("-created_at")
+        return cls.objects.filter(
+            user=user,
+            event_code__in=notification_enums.USER_NOTIFICATION_EVENT_CODES,
+        ).order_by("is_seen", "-created_at")
+
+    # --------- Mutators ---------
+    @classmethod
+    def bulk_mark_seen(cls, ids):
+        notifications = cls.objects.filter(id__in=ids)
+        for noti in notifications:
+            noti.mark_seen(save=False)
+        cls.objects.bulk_update(
+            notifications,
+            ["is_seen"],
+        )
+
+    def mark_seen(self, save=True):
+        self.is_seen = True
+        if save:
+            self.save()

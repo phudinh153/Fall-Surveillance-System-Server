@@ -12,6 +12,9 @@ class EventCodeChoices(models.TextChoices):
     UPDATE_ROOM_METADATA = "UPDATE_ROOM_METADATA", "Update room meta data"
     INVITE_MEMBER_TO_ROOM = "INVITE_MEMBER_TO_ROOM", "Invited to Room"
 
+    # User Events
+    # ...
+
 
 DEVICE_NOTIFICATION_EVENT_CODES = [
     EventCodeChoices.DEVICE_FALL_DETECTED,
@@ -27,3 +30,7 @@ HOUSE_NOTIFICATION_EVENT_CODES = [
     EventCodeChoices.REMOVE_MEMBER_FROM_HOUSE,
     EventCodeChoices.UPDATE_HOUSE_METADATA,
 ]
+
+USER_NOTIFICATION_EVENT_CODES = []
+
+DEVICE_NOTIFICATION_EVENT_CODES = [EventCodeChoices.DEVICE_FALL_DETECTED]

@@ -13,5 +13,21 @@ class RNotification(serializers.ModelSerializer):
             "label",
             "description",
             "event_code",
+            "is_seen",
             "meta",
         ]
+
+
+class MarkSeenNotification(serializers.Serializer):
+    ids = serializers.ListField(child=serializers.UUIDField())
+
+    def create(self, validated_data):
+        ids = validated_data.get("ids")
+        models.Notification.bulk_mark_seen(ids)
+
+        class DumpClass:
+            ids = None
+
+        a = DumpClass()
+        a.ids = ids
+        return a
