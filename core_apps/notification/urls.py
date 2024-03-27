@@ -17,4 +17,8 @@ urlpatterns = [
         "<uuid:id>/mark-seen/",
         notification_views.MarkSeenNotification.as_view(),
     ),
+    path(
+        "private/",
+        notification_views.UserNotification.as_view(),
+    ),
 ]

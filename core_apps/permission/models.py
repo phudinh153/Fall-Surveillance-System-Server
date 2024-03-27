@@ -84,6 +84,7 @@ class Permission(models.Model):
 
     @classmethod
     def grant_houses_owner_permissions(cls, user, *houses):
+        print("granting owner", flush=True)
         cls.grant_houses_permissions(user, enums.HOUSE_PERMISSIONS, *houses)
 
     @classmethod

@@ -42,33 +42,84 @@ class Notification(TimeStampedModel):
 
     # --------- Factory Methods ---------
     @classmethod
-    def _create_house_notification(
-        cls, event_code, house, label, description, meta: dict = None
+    def _create_user_notification(
+        cls,
+        event_code,
+        user,
+        label,
+        description,
+        meta: dict = None,
+        save=True,
     ):
-        return cls.objects.create(
+        noti = cls(
+            user=user,
+            event_code=event_code,
+            label=label,
+            description=description,
+            meta=meta,
+        )
+        if save:
+            noti.save()
+        return noti
+
+    @classmethod
+    def _create_house_notification(
+        cls,
+        event_code,
+        house,
+        label,
+        description,
+        meta: dict = None,
+        save=True,
+    ):
+        noti = cls(
             house=house,
             event_code=event_code,
             label=label,
             description=description,
             meta=meta,
         )
+        if save:
+            noti.save()
+        return noti
 
     @classmethod
     def create_add_house_member_notification(cls, house, invitor, new_members):
         from core_apps.user.serializers import ReadBasicUserProfile
+        from core_apps.house.serializers import RHouseBasic
 
-        notification = cls._create_house_notification(
+        invitor_json = ReadBasicUserProfile(invitor).data
+
+        cls._create_house_notification(
             house=house,
             event_code=notification_enums.EventCodeChoices.ADD_MEMBER_TO_HOUSE,
             label="New member joined",
             description="",
             meta={
-                "invitor": ReadBasicUserProfile(invitor).data,
+                "invitor": invitor_json,
                 "description": f"{invitor.username} has joined the house",
                 "member": ReadBasicUserProfile(new_members, many=True).data,
             },
         )
-        return notification
+
+        # Notify member on there Inbox
+        member_notify = [
+            cls._create_user_notification(
+                event_code=notification_enums.EventCodeChoices.IS_INVITED_TO_HOUSE,
+                user=user,
+                label="You have been invited to a house",
+                description="",
+                meta={
+                    "invitor": invitor_json,
+                    "description": f"{invitor.username} invited you to house {house.name}",
+                    "house": RHouseBasic(house).data,
+                },
+                save=False,
+            )
+            for user in new_members
+        ]
+
+        cls.objects.bulk_create(member_notify, ignore_conflicts=True)
 
     @classmethod
     def create_update_house_metadata_notification(
@@ -82,7 +133,7 @@ class Notification(TimeStampedModel):
         from core_apps.user.serializers import ReadBasicUserProfile
         from core_apps.house.serializers import RHouseBasic
 
-        notification = cls._create_house_notification(
+        cls._create_house_notification(
             house=house,
             event_code=notification_enums.EventCodeChoices.UPDATE_HOUSE_METADATA,
             label="House info updated",
@@ -94,39 +145,67 @@ class Notification(TimeStampedModel):
                 "old_values": old_values,
             },
         )
-        return notification
 
     @classmethod
     def _create_room_notification(
-        cls, event_code, room, label, description, meta: dict = None
+        cls,
+        event_code,
+        room,
+        label,
+        description,
+        meta: dict = None,
+        save=True,
     ):
-        return cls.objects.create(
+        noti = cls(
             room=room,
             event_code=event_code,
             label=label,
             description=description,
             meta=meta,
         )
+        if save:
+            noti.save()
+        return noti
 
     @classmethod
     def create_add_room_member_notification(cls, room, invitor, new_members):
         from core_apps.user.serializers import ReadBasicUserProfile
+        from core_apps.house.serializers import RRoomBasic
         from . import enums
 
-        notification = cls._create_room_notification(
+        invitor_json = ReadBasicUserProfile(invitor).data
+
+        cls._create_room_notification(
             room=room,
             event_code=enums.EventCodeChoices.INVITE_MEMBER_TO_ROOM,
             label="Add members to room",
             description="",
             meta={
-                "invitor": ReadBasicUserProfile(invitor).data,
+                "invitor": invitor_json,
                 "description": f"{invitor.username} invited new members to room {room.name}",
                 "new_members": ReadBasicUserProfile(
                     new_members, many=True
                 ).data,
             },
         )
-        return notification
+
+        # Notify User On there Inbox
+        user_notify = [
+            cls._create_user_notification(
+                event_code=enums.EventCodeChoices.IS_INVITED_TO_ROOM,
+                user=user,
+                label="You have been invited to a room",
+                description="",
+                meta={
+                    "invitor": invitor_json,
+                    "description": f"{invitor.username} invited you to room {room.name}",
+                    "room": RRoomBasic(room).data,
+                },
+                save=False,
+            )
+            for user in new_members
+        ]
+        cls.objects.bulk_create(user_notify, ignore_conflicts=True)
 
     @classmethod
     def create_update_room_metadata_notification(
