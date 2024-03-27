@@ -14,6 +14,7 @@ class RNotification(serializers.ModelSerializer):
             "description",
             "event_code",
             "is_seen",
+            "created_at",
             "meta",
         ]
 

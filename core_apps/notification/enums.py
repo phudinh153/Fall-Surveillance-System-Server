@@ -13,6 +13,14 @@ class EventCodeChoices(models.TextChoices):
     INVITE_MEMBER_TO_ROOM = "INVITE_MEMBER_TO_ROOM", "Invited to Room"
 
     # User Events
+    IS_INVITED_TO_ROOM = "INVITED_TO_ROOM", "Invited to Room"
+    IS_INVITED_TO_HOUSE = "INVITED_TO_HOUSE", "Invited to House"
+    REMOVED_FROM_ROOM = "REMOVED_FROM_ROOM", "Removed from Room"
+    REMOVED_FROM_HOUSE = "REMOVED_FROM_HOUSE", "Removed from House"
+    NOTIFY_USER_DEVICE_FALL_DETECTED = (
+        "NOTIFY_USER_DEVICE_FALL_DETECTED",
+        "Fall Detected",
+    )
     # ...
 
 
@@ -31,6 +39,12 @@ HOUSE_NOTIFICATION_EVENT_CODES = [
     EventCodeChoices.UPDATE_HOUSE_METADATA,
 ]
 
-USER_NOTIFICATION_EVENT_CODES = []
+USER_NOTIFICATION_EVENT_CODES = [
+    EventCodeChoices.IS_INVITED_TO_HOUSE,
+    EventCodeChoices.IS_INVITED_TO_ROOM,
+    EventCodeChoices.REMOVED_FROM_ROOM,
+    EventCodeChoices.REMOVED_FROM_HOUSE,
+    EventCodeChoices.NOTIFY_USER_DEVICE_FALL_DETECTED,
+]
 
 DEVICE_NOTIFICATION_EVENT_CODES = [EventCodeChoices.DEVICE_FALL_DETECTED]
