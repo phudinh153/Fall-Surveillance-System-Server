@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
-from rest_framework.filters import OrderingFilter
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
 from core_apps.house import models as house_models
 from schema.paginators import SmallSizePagination
 from django_filters.rest_framework import DjangoFilterBackend
@@ -53,3 +55,22 @@ class MarkSeenNotification(generics.CreateAPIView):
     queryset = notification_models.Notification.objects.all()
     lookup_field = "id"
     serializer_class = notification_serializers.MarkSeenNotification
+
+
+class EventCodeNotification(APIView):
+    def get(self, request):
+        from .enums import (
+            USER_NOTIFICATION_EVENT_CODES,
+            HOUSE_NOTIFICATION_EVENT_CODES,
+            ROOM_NOTIFICATION_EVENT_CODES,
+            DEVICE_NOTIFICATION_EVENT_CODES,
+        )
+
+        return Response(
+            {
+                "USER_NOTIFICATION_EVENT_CODES": USER_NOTIFICATION_EVENT_CODES,
+                "HOUSE_NOTIFICATION_EVENT_CODES": HOUSE_NOTIFICATION_EVENT_CODES,
+                "ROOM_NOTIFICATION_EVENT_CODES": ROOM_NOTIFICATION_EVENT_CODES,
+                "DEVICE_NOTIFICATION_EVENT_CODES": DEVICE_NOTIFICATION_EVENT_CODES,
+            }
+        )

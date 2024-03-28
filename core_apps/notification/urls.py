@@ -21,4 +21,7 @@ urlpatterns = [
         "private/",
         notification_views.UserNotification.as_view(),
     ),
+    path(
+        "event-code/all/", notification_views.EventCodeNotification.as_view()
+    ),
 ]
