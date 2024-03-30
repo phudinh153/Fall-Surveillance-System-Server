@@ -42,7 +42,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "core_apps.user",
     "core_apps.identity",
-    "core_apps.task",
+    "core_apps.fanout",
     "core_apps.house",
     "core_apps.device",
     "core_apps.permission",

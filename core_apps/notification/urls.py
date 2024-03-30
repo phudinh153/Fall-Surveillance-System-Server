@@ -24,4 +24,5 @@ urlpatterns = [
     path(
         "event-code/all/", notification_views.EventCodeNotification.as_view()
     ),
+    path("test-celery/", notification_views.TestCelery.as_view()),
 ]

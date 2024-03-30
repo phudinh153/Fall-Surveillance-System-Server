@@ -14,6 +14,8 @@ DEFAULT_DATABASE_URL = env.db(
     "DATABASE_URL", f"sqlite:///{ROOT_DIR}/db.sqlite3"
 )
 
+NOTIFICATION_URL = env.str("NOTIFICATION_URL", "http://notification:8000")
+
 CELERY_BROKER_URL = env.str("BROKER_URL", "amqp://guest:guest@rabbitmq:5672/")
 
 DEBUG = env.bool("DJANGO_DEBUG", True)
