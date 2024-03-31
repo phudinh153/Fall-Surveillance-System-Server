@@ -3,6 +3,10 @@ from . import models
 
 
 class RNotification(serializers.ModelSerializer):
+    house = serializers.UUIDField(source="house.id", allow_null=True)
+    room = serializers.UUIDField(source="room.id", allow_null=True)
+    user = serializers.UUIDField(source="user.id", allow_null=True)
+
     class Meta:
         model = models.Notification
         fields = [

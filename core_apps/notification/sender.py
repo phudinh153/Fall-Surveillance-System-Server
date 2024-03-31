@@ -1,5 +1,7 @@
 from constants.config import NOTIFICATION_URL
+import urllib.parse as urlparse
 from mixin.common import SingletonMeta
+import requests
 
 
 class NotificationSender(SingletonMeta):
@@ -9,5 +11,9 @@ class NotificationSender(SingletonMeta):
         return
         # return
 
-    def send(self, user_ids, messages):
-        pass
+    def send(self, endpoint, method, params, body, headers={}):
+        assert method in ["get", "post", "put", "delete"], "Invalid method"
+
+        url = urlparse.urljoin(self._base_url, endpoint)
+        fetcher = getattr(requests, method)
+        return fetcher(url, json=body, params=params, headers=headers)
