@@ -1,7 +1,7 @@
 import celery
 
 
-@celery.shared_task(name="send_notification")
+@celery.shared_task()
 def send_notification():
     from time import sleep
 

@@ -78,7 +78,7 @@ class EventCodeNotification(APIView):
 
 class TestCelery(APIView):
     def get(self, request):
-        from .task import send_notification
+        from .tasks import send_notification
 
         send_notification.delay()
         return Response(
