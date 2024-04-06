@@ -378,6 +378,7 @@ class AddHouseMember(serializers.Serializer):
     def create(self, validated_data):
         from core_apps.permission.models import Permission, PermissionType
         from core_apps.notification.models import Notification
+        from core_apps.notification import tasks
 
         to_add_members = validated_data["add_members"]
         house_id = validated_data["house_id"]
@@ -427,18 +428,20 @@ class AddHouseMember(serializers.Serializer):
         for p in correspond_permissions:
             p.houses.add(house)
 
-        users = User.objects.filter(
-            id__in=[member["id"] for member in to_add_members]
-        )
-        house.members.add(*users)
+        house.members.add(*members)
 
         # Notification
         Notification.create_add_house_member_notification(
             house=house,
             invitor=self.context.get("request").user,
-            new_members=users,
+            new_members=members,
         )
-        # FIXME: Fire notifications to all house members except invitor.
+
+        tasks.push_is_added_to_house_notification.delay(
+            house_d=house_id,
+            invitor_id=self.context.get("request").user.id,
+            invitee_ids=[user.id for user in members],
+        )
         return house
 
 
@@ -609,6 +612,7 @@ class AddRoomMember(serializers.Serializer):
 
     def create(self, validated_data):
         from core_apps.notification.models import Notification
+        from core_apps.notification import tasks as noti_tasks
 
         to_add_members = validated_data["add_members"]
         room_id = validated_data["room_id"]
@@ -637,6 +641,11 @@ class AddRoomMember(serializers.Serializer):
             room=room,
             invitor=self.context.get("request").user,
             new_members=new_members,
+        )
+        noti_tasks.push_is_added_to_room_notification.delay(
+            room_id=room.id,
+            invitor_id=self.context.get("request").user.id,
+            invitee_ids=[user.id for user in new_members],
         )
 
         return room

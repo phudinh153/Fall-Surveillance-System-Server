@@ -74,14 +74,3 @@ class EventCodeNotification(APIView):
                 "DEVICE_NOTIFICATION_EVENT_CODES": DEVICE_NOTIFICATION_EVENT_CODES,
             }
         )
-
-
-class TestCelery(APIView):
-    def get(self, request):
-        from .tasks import send_notification
-
-        send_notification.delay()
-        return Response(
-            {"status": "ok", "message": "Notification sent"},
-            status=status.HTTP_200_OK,
-        )
