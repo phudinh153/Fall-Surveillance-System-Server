@@ -59,4 +59,5 @@ class BaseHttpService:
             if auth
             else headers
         )
-        return fetcher(url, json=body, params=params, headers=headers)
+        response = fetcher(url, json=body, params=params, headers=headers)
+        return response

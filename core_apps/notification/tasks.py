@@ -12,6 +12,8 @@ user_service = UserNotificationSender.new_service(
     message_class=UserNotificationMessage,
 )
 
+DEFAULT_NOTI_IMAGE = "https://www.pushengage.com/wp-content/uploads/2022/10/How-to-Add-a-Push-Notification-Icon.png"
+
 
 @celery.shared_task
 def push_is_added_to_house_notification(house_id, invitor_id, invitee_ids):
@@ -25,7 +27,7 @@ def push_is_added_to_house_notification(house_id, invitor_id, invitee_ids):
         message=UserNotificationMessage.create_new(
             username=invitor.get_username(),
             avatar=invitor.profile.avatar,
-            des_image="",
+            des_image=DEFAULT_NOTI_IMAGE,
             des_name=house.name,
         ),
     )
@@ -43,7 +45,7 @@ def push_is_added_to_room_notification(room_id, invitor_id, invitee_ids):
         message=UserNotificationMessage.create_new(
             username=invitor.get_username(),
             avatar=invitor.profile.avatar,
-            des_image="",
+            des_image=DEFAULT_NOTI_IMAGE,
             des_name=room.name,
         ),
     )
