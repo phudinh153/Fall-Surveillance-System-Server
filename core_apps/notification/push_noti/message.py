@@ -6,12 +6,12 @@ class BaseNotificationMessage:
 
     @classmethod
     def create_new(cls, username="", avatar="", des_name="", des_image=""):
-        return cls(
-            username=username,
-            avatar=avatar,
-            des_name=des_name,
-            des_image=des_image,
-        )
+        message = cls()
+        message.username = (username,)
+        message.avatar = (avatar,)
+        message.des_name = (des_name,)
+        message.des_image = (des_image,)
+        return message
 
     def to_dict(self):
         return {
