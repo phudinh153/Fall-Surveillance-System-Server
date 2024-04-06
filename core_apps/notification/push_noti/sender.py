@@ -48,4 +48,4 @@ class NotificationSender(BaseHttpService, metaclass=SingletonMeta):
 
 
 class UserNotificationSender(NotificationSender):
-    endpoint = "/app-notify/"
+    endpoint = "/app-notify"
