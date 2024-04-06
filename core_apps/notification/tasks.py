@@ -1,9 +1,9 @@
 import celery
-from push_noti.message import UserNotificationMessage
-from push_noti.sender import UserNotificationSender
 from constants.config import NOTIFICATION_URL
 from django.contrib.auth import get_user_model
 from .enums import EventCodeChoices
+from .push_noti.sender import UserNotificationSender
+from .push_noti.message import UserNotificationMessage
 
 User = get_user_model()
 

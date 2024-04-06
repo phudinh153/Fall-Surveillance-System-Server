@@ -438,7 +438,7 @@ class AddHouseMember(serializers.Serializer):
         )
 
         tasks.push_is_added_to_house_notification.delay(
-            house_d=house_id,
+            house_id=house_id,
             invitor_id=self.context.get("request").user.id,
             invitee_ids=[user.id for user in members],
         )

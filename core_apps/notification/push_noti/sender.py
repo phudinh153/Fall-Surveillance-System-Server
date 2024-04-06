@@ -1,5 +1,5 @@
 from mixin.common import SingletonMeta, BaseHttpService
-from .message import NotificationMessage
+from .message import BaseNotificationMessage
 
 
 class NotificationSender(BaseHttpService, metaclass=SingletonMeta):
@@ -26,7 +26,7 @@ class NotificationSender(BaseHttpService, metaclass=SingletonMeta):
         return isinstance(meta, self.metaclass)
 
     def make_request_body(
-        self, event_code, receiver_ids, message: NotificationMessage
+        self, event_code, receiver_ids, message: BaseNotificationMessage
     ):
         assert self.validate_meta(message), "Invalid message body"
         return {
@@ -35,7 +35,7 @@ class NotificationSender(BaseHttpService, metaclass=SingletonMeta):
             "meta": message.to_dict(),
         }
 
-    def push(self, event_code, receiver_ids, message: NotificationMessage):
+    def push(self, event_code, receiver_ids, message: BaseNotificationMessage):
         self._send(
             self.get_push_endpoint(),
             "post",
