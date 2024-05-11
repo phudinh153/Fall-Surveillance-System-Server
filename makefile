@@ -1,6 +1,9 @@
 build-production:
 	docker compose -f production.yaml up --build -d --remove-orphans
 
+connect-table-production:
+	open postgres://maroon:71102Tony@14.225.204.127/fall_detection
+
 connect-table-local:
 	open postgres://maroon:71102Tony@127.0.0.1:5432/boilerplate
 
@@ -11,6 +14,12 @@ up:
 
 down:
 	docker compose -f local.yaml down
+
+show-logs-prod:
+	docker compose -f production.yaml logs
+
+show-log-api-prod:
+	docker compose -f production.yaml logs api
 
 show-logs:
 	docker compose -f local.yaml logs

@@ -11,11 +11,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="device",
-            name="serial_number",
-            field=models.CharField(max_length=255, unique=True),
-        ),
-        migrations.AlterField(
             model_name="devicespec",
             name="series_name",
             field=models.CharField(max_length=255),

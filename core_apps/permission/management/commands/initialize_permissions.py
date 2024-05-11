@@ -25,6 +25,6 @@ class Command(management.BaseCommand):
         Permission.initialize_users_permissions(*to_fix_users)
         self.stdout.write(
             self.style.SUCCESS(
-                "Done! All user have corresponding Permission tracking table"
+                "Done! All user have corresponding Permission table"
             )
         )
