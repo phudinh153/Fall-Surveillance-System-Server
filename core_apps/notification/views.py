@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from core_apps.house import models as house_models
+from core_apps.device import models as device_models
 from schema.paginators import SmallSizePagination
 from django_filters.rest_framework import DjangoFilterBackend
 from . import models as notification_models
@@ -48,6 +49,20 @@ class UserNotification(generics.ListAPIView):
     def get_queryset(self):
         return notification_models.Notification.get_user_notifications(
             user=self.request.user
+        )
+
+
+class DeviceNotification(generics.ListAPIView):
+    serializer_class = notification_serializers.RNotification
+    pagination_class = SmallSizePagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["is_seen", "event_code"]
+
+    def get_queryset(self):
+        device_id = self.kwargs.get("device_id")
+        device = get_object_or_404(device_models.Device, id=device_id)
+        return notification_models.Notification.get_device_notifications(
+            device=device
         )
 
 

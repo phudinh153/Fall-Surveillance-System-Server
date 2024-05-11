@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from core_apps.house import models as house_models
 from . import enums as notification_enums, managers as notification_managers
+from core_apps.device import models as device_models
 
 
 # Create your models here.
@@ -22,6 +23,12 @@ class Notification(TimeStampedModel):
     )
     room = models.ForeignKey(
         house_models.Room,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+        null=True,
+    )
+    device = models.ForeignKey(
+        device_models.Device,
         on_delete=models.CASCADE,
         related_name="notifications",
         null=True,
@@ -82,6 +89,47 @@ class Notification(TimeStampedModel):
         if save:
             noti.save()
         return noti
+
+    @classmethod
+    def _create_device_notificatio(
+        cls,
+        event_code,
+        device,
+        label,
+        description,
+        meta: dict = None,
+        save=True,
+    ):
+        noti = cls(
+            device=device,
+            event_code=event_code,
+            label=label,
+            description=description,
+            meta=meta,
+        )
+        if save:
+            noti.save()
+        return noti
+
+    @classmethod
+    def create_users_notified_fall(cls, users, device):
+        from core_apps.device.serializers import RDeviceDetail
+
+        notifications = [
+            cls._create_user_notification(
+                user=user,
+                event_code=notification_enums.EventCodeChoices.NOTIFY_USER_DEVICE_FALL_DETECTED,
+                label="Fall Detected",
+                description="",
+                meta={
+                    "device": RDeviceDetail(device).data,
+                    "description": f"Fall detected on device {device.name}",
+                },
+                save=False,
+            )
+            for user in users
+        ]
+        cls.objects.bulk_create(notifications, ignore_conflicts=True)
 
     @classmethod
     def create_add_house_member_notification(cls, house, invitor, new_members):
@@ -236,7 +284,33 @@ class Notification(TimeStampedModel):
 
         return notification
 
+    @classmethod
+    def create_fall_detected_device_notification(
+        cls, device, fall_image: str = None
+    ):
+        from core_apps.device.serializers import RDeviceDetail
+
+        notification = cls._create_device_notificatio(
+            device=device,
+            event_code=notification_enums.EventCodeChoices.DEVICE_FALL_DETECTED,
+            label="Fall Detected",
+            description="",
+            meta={
+                "device": RDeviceDetail(device).data,
+                "image": fall_image,
+            },
+        )
+
+        return notification
+
     # --------- Queries ---------
+    @classmethod
+    def get_device_notifications(cls, device):
+        return cls.objects.filter(
+            device=device,
+            event_code__in=notification_enums.DEVICE_NOTIFICATION_EVENT_CODES,
+        ).order_by("is_seen", "-created_at")
+
     @classmethod
     def get_house_notifications(cls, house):
         return cls.objects.filter(

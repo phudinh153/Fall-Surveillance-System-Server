@@ -18,7 +18,7 @@ services:
     # FIXME: Using 3rd provider postgres db
     depends_on:
       - postgres
-    command:  /start.sh
+    command: /start.sh
     networks:
       - instagram-api
 

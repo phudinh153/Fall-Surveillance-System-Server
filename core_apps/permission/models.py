@@ -199,6 +199,17 @@ class Permission(models.Model):
             )
         return cls.objects.filter(user=user, rooms=room)
 
+    @classmethod
+    def get_users_from_room_permission(
+        cls, room_id, permission_names: list[str]
+    ):
+        user_ids = cls.objects.filter(
+            rooms__id=room_id, permission_type__name__in=permission_names
+        ).values_list("user", flat=True)
+        users = User.objects.filter(pkid__in=user_ids).distinct()
+
+        return users
+
     # ----- Properties
 
     @classmethod

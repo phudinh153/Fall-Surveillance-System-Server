@@ -17,7 +17,6 @@ class EventCodeChoices(models.TextChoices):
     IS_INVITED_TO_HOUSE = "INVITED_TO_HOUSE", "Invited to House"
     REMOVED_FROM_ROOM = "REMOVED_FROM_ROOM", "Removed from Room"
     REMOVED_FROM_HOUSE = "REMOVED_FROM_HOUSE", "Removed from House"
-
     NOTIFY_USER_DEVICE_FALL_DETECTED = (
         "NOTIFY_USER_DEVICE_FALL_DETECTED",
         "Fall Detected",

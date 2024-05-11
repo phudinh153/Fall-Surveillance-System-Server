@@ -1,6 +1,9 @@
 build-production:
 	docker compose -f production.yaml up --build -d --remove-orphans
 
+connect-table-local:
+	open postgres://maroon:71102Tony@127.0.0.1:5432/boilerplate
+
 build:
 	docker compose -f local.yaml up --build -d --remove-orphans
 up:
@@ -72,8 +75,6 @@ initialize_users_permissions:
 
 initialize_users_permissions-production:
 	docker compose -f production.yaml exec api python manage.py initialize_permissions
-
-
 
 # make command="python manage.py createsuperuser"
 exec: 

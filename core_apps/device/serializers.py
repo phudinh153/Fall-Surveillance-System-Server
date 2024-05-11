@@ -80,7 +80,7 @@ class CRUDevice(serializers.ModelSerializer, NoUpdateSerializer):
 
 class RDeviceDetail(CRUDevice):
     related_users = user_serializers.ReadBasicUserProfile(
-        source="get_room_users", many=True, read_only=True
+        source="get_notinable_users", many=True, read_only=True
     )
 
     class Meta(CRUDevice.Meta):

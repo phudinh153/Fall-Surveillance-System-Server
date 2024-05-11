@@ -14,6 +14,10 @@ urlpatterns = [
         notification_views.HouseNotification.as_view(),
     ),
     path(
+        "device/<uuid:device_id>/",
+        notification_views.DeviceNotification.as_view(),
+    ),
+    path(
         "<uuid:id>/mark-seen/",
         notification_views.MarkSeenNotification.as_view(),
     ),

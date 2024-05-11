@@ -4,6 +4,9 @@ from . import enums, managers
 from core_apps.house import models as house_models
 from django.shortcuts import get_object_or_404
 from utils import random as random_utils
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class DeviceSpec(models.Model):
@@ -41,7 +44,7 @@ class Device(TimeStampedModel):
     device_type = models.CharField(
         choices=enums.DeviceType.choices, max_length=50
     )
-    serial_number = models.CharField(max_length=255)
+    serial_number = models.CharField(max_length=255, null=False)
     secret = models.CharField(max_length=100, blank=False)
     status = models.CharField(
         choices=enums.DeviceStatus.choices,
@@ -89,8 +92,15 @@ class Device(TimeStampedModel):
         return cls.objects.filter(room__house=house)
 
     # ------ Properties ------
-    def get_room_users(self):
-        return self.room.get_room_members()
+    def get_notinable_users(self):
+        from core_apps.permission import models as permission_models
+        from core_apps.permission import enums as permission_enums
+
+        users = permission_models.Permission.get_users_from_room_permission(
+            self.room.id,
+            [permission_enums.PermissionTypeChoices.RECEIVE_ROOM_NOTIFICATION],
+        )
+        return users
 
     # ------- Mutators -------
     def update(self, name):

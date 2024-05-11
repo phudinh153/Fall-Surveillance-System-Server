@@ -6,6 +6,7 @@ class RNotification(serializers.ModelSerializer):
     house = serializers.UUIDField(source="house.id", allow_null=True)
     room = serializers.UUIDField(source="room.id", allow_null=True)
     user = serializers.UUIDField(source="user.id", allow_null=True)
+    device = serializers.UUIDField(source="device.id", allow_null=True)
 
     class Meta:
         model = models.Notification
@@ -14,6 +15,7 @@ class RNotification(serializers.ModelSerializer):
             "user",
             "house",
             "room",
+            "device",
             "label",
             "description",
             "event_code",

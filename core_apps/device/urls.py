@@ -17,4 +17,12 @@ urlpatterns = [
         views.RetrieveDeviceDetailView.as_view(),
     ),
     path("specifications/", include(device_spec_router.urls)),
+    path(
+        "devices/serial-number/<str:serial>/",
+        views.DeviceInfoFromSerialNumber.as_view(),
+    ),
+    path(
+        "devices/<uuid:device_id>/fall-detected/",
+        views.NewFallDetectedDeviceNotification.as_view(),
+    ),
 ]
