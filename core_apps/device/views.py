@@ -132,6 +132,7 @@ class DeviceInfoFromSerialNumber(APIView):
         device = models.Device.objects.filter(
             serial_number=kwargs["serial"]
         ).first()
+
         if device is None:
             return Response()
 

@@ -69,12 +69,20 @@ class CRUDevice(serializers.ModelSerializer, NoUpdateSerializer):
     def create(self, validated_data):
         room = self.context.get("room")
         spec_id = validated_data.pop("specification_id")
+        serial_number = validated_data.get("serial_number", "")
+        existed = models.Device.objects.filter(
+            serial_number=serial_number
+        ).exists()
+        if existed:
+            raise serializers.ValidationError(
+                {"serial_number": ["Serial number Incorrected"]}
+            )
         return models.Device.create_new_for_room(
             room=room,
             spec_id=spec_id,
             name=validated_data.get("name", ""),
             device_type=validated_data.get("device_type", ""),
-            serial_number=validated_data.get("serial_number", ""),
+            serial_number=serial_number,
         )
 
 
