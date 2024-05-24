@@ -109,19 +109,25 @@ class NewFallDetectedDeviceNotification(APIView):
     def post(self, request, *args, **kwargs):
         from core_apps.notification import models as notification_models
 
-        device = get_object_or_404(models.Device, id=kwargs["device_id"])
-        notification = notification_models.Notification.create_fall_detected_device_notification(
-            device=device, fall_image=request.data.get("fall_image", "")
-        )
-        noticible_users = device.get_notinable_users()
-        notification_models.Notification.create_users_notified_fall(
-            users=noticible_users, device=device
-        )
+        try:
+            device = get_object_or_404(models.Device, id=kwargs["device_id"])
+            notification = notification_models.Notification.create_fall_detected_device_notification(
+                device=device, fall_image=request.data.get("fall_image", "")
+            )
+            noticible_users = device.get_notinable_users()
+            notification_models.Notification.create_users_notified_fall(
+                users=noticible_users, device=device
+            )
 
-        return Response(
-            {"notification_id": notification.id},
-            status=status.HTTP_201_CREATED,
-        )
+            return Response(
+                {"notification_id": notification.id},
+                status=status.HTTP_201_CREATED,
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class DeviceInfoFromSerialNumber(APIView):
